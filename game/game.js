@@ -76,6 +76,12 @@ function move_fig(figures) {
         if (!(occupied)) {
             for (let l = 0; l < temp_fig[i].cubes; l++) {
                 create_cube(temp_fig[i].cubes[l].x, temp_fig[i].cubes[l].y + 60, size, temp_fig[i].cubes[l].color, temp_fig[i].cubes[l].id);
+                // remove old cubes from arrays
+                for (let m = 0; m < temp_cubes.length; m++) {
+                    if (temp_fig[i].cubes[l].x == temp_cubes[m].x && temp_fig[i].cubes[l].y == temp_cubes[m].y) {
+                        
+                    }
+                }
             }
         }
         occupied = false;
