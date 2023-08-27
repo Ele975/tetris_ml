@@ -16,7 +16,6 @@ var occupied_tiles = new Array();
 var cube_id = 0;
 var fig_id = 0;
 
-
 function run() {
 
     // continue to call
@@ -45,7 +44,6 @@ function figures(tetrominoes, size, x_coord, colors, cubes) {
     const rnd_key = keysArray[Math.floor(Math.random() * keysArray.length)];
     let val = tetrominoes[rnd_key];
     val(init_coord_x, size, color, cubes);
-
     // move all figures down every 1 second
     setInterval(() => move_fig(fig), 1000);
 }
@@ -57,29 +55,55 @@ figures -> array of figure objects
 */
 function move_fig(figures) {
     // remove from fig, cubes and occupied_tiles
-    let temp_fig = fig;
-    let temp_cubes = cubes;
-    let temp_occupied_tiles = occupied_tiles;
+    let temp_fig = fig.slice();
+    let temp_cubes = cubes.slice();
+    let temp_occupied_tiles = occupied_tiles.slice();
+    // console.log(cubes);
+    // cubes = new Array();
+    // occupied_tiles = new Array();
+    console.log(temp_fig);
     for (let i = 0; i < temp_fig.length; i++) {
+        // OCCUPIED IS MORE COMPLEX -> SHOW OCCUPIED FOR SQUARE BECAUSE BELOW ROW IS OCCUPIED
         let occupied = false;
-        for (let j = 0; j < temp_fig[i].cubes; j++) {
-            let new_x = temp_fig[i].cubes[j].x
-            let new_y = temp_fig[i].cubes[j].y + 60;
-            // check if tile for new position is occupied
-            for (let k = 0; k < temp_occupied_tiles.length; k++) {
-                if (occupied_tiles[k][0] == new_x && occupied_tiles[k][1] == new_y) {
-                    occupied = true;
-                    break;
+        for (let j = 0; j < temp_fig[i].cubes.length; j++) {
+            // check if tile for new position is occupied by a different figure
+            let current_new_x = temp_fig[i].cubes[j].x;
+            let current_new_y = temp_fig[i].cubes[j].y + 60;
+            // console.log(temp_fig[i].cubes.length);
+            if (temp_fig.length != 1) {
+                
+                for (let k = j + 1; k < temp_fig[i].cubes.length; k++) {
+                    let other_new_x = temp_fig[i].cubes[k].x;
+                    let other_new_y = temp_fig[i].cubes[k].y + 60;
+    
+                    if (current_new_x == other_new_x && current_new_y == other_new_y) {
+                        console.log('OCCUPIED');
+                        occupied = true;
+                        break;
+                    }
                 }
+            }
+            if (occupied) {
+                break;
             }
         }
         if (!(occupied)) {
-            for (let l = 0; l < temp_fig[i].cubes; l++) {
+            console.log('entered');
+            // create new cubes in new coordinates of current figure and remove current ones
+            for (let l = 0; l < temp_fig[i].cubes.length; l++) {
+                clear(temp_fig[i].cubes[l]);
                 create_cube(temp_fig[i].cubes[l].x, temp_fig[i].cubes[l].y + 60, size, temp_fig[i].cubes[l].color, temp_fig[i].cubes[l].id);
-                // remove old cubes from arrays
+
+                // update position of cubes in all arrays
                 for (let m = 0; m < temp_cubes.length; m++) {
                     if (temp_fig[i].cubes[l].x == temp_cubes[m].x && temp_fig[i].cubes[l].y == temp_cubes[m].y) {
-                        
+                        cubes[m].y += 60;
+                    }
+                }
+
+                for (let m = 0; m < temp_occupied_tiles.length; m++) {
+                    if (temp_fig[i].cubes[l].x == temp_occupied_tiles[m][0] && temp_fig[i].cubes[l].y == temp_occupied_tiles[m][1]) {
+                        occupied_tiles[m][1] += 60;
                     }
                 }
             }
@@ -87,32 +111,55 @@ function move_fig(figures) {
         occupied = false;
     }
 
-
-
-
-
-
-    old_x = cube_obj.x;
-    old_y = cube_obj.y;
-    color = cube_obj.color;
-    size = cube_obj.size;
-    clear(cube_obj);
-    ctx.beginPath();
-    // ctx.fillStyle = color;
-    // ctx.fillRect(old_x,old_y + 60, size, size);
-    ctx.fillStyle = color;
-    ctx.strokeStyle = 'black';
-    var fillRect = false;
-    ctx.rect(old_x, old_y + 60, size, size);
-    if (fillRect) {
-    ctx.fill();
+    for (let i = 0; i < temp_fig.length; i++) {
+        for (let j = 0; j < temp_fig[i].cubes; j++) {
+            for (let k = 0; k < temp_occupied_tiles.length; k++) {
+                if (temp_fig[i].cubes[j].x == temp_occupied_tiles[k][0] && temp_fig[i].cubes[j].y == temp_occupied_tiles[k][1]) {
+                    fig[i].cubes[j].y += 60;
+                }
+            }
+        }
     }
-    ctx.stroke();
-    cube_obj = {x:old_x, y:old_y + 60, size:size, color:color};
-    ctx.stroke();
-    return cube_obj;
-
 }
+
+    //     if (occupied == false) {
+    //         console.log(temp_fig[0].cubes);
+    //         for (let l = 0; l < temp_fig[i].cubes.length; l++) {
+    //             // console.log('occupied');
+    //             create_cube(temp_fig[i].cubes[l].x, temp_fig[i].cubes[l].y + 60, size, temp_fig[i].cubes[l].color, temp_fig[i].cubes[l].id);
+    //             // update cubes with new coordinates in arrays
+    //             for (let m = 0; m < temp_cubes.length; m++) {
+    //                 if (temp_fig[i].cubes[l].x == temp_cubes[m].x && temp_fig[i].cubes[l].y == temp_cubes[m].y) {
+    //                     cubes[m].y += 60;
+    //                     clear(temp_cubes[m]);
+    //                 }
+    //             }
+
+    //             for (let m = 0; m < temp_occupied_tiles.length; m++) {
+    //                 // console.log(temp_fig[i].cubes[l].x);
+    //                 // console.log(temp_occupied_tiles[m][0]);
+    //                 // console.log(temp_fig[i].cubes[l].y);
+    //                 // console.log(temp_occupied_tiles[m][1]);
+    //                 // console.log('------------');
+    //                 if (temp_fig[i].cubes[l].x == temp_occupied_tiles[m][0] && temp_fig[i].cubes[l].y == temp_occupied_tiles[m][1]) {
+    //                     occupied_tiles[m][1] += 60;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     occupied = false;
+    // }
+
+    // for (let i = 0; i < temp_fig.length; i++) {
+    //     for (let j = 0; j < temp_fig[i].cubes; j++) {
+    //         for (let k = 0; k < temp_occupied_tiles.length; k++) {
+    //             if (temp_fig[i].cubes[j].x == temp_occupied_tiles[k][0] && temp_fig[i].cubes[j].y == temp_occupied_tiles[k][1]) {
+    //                 fig[i].cubes[j].y += 60;
+    //             }
+    //         }
+    //     }
+    // }
+// }
 
 function rotate_left() {
 
