@@ -72,7 +72,6 @@ function move_down(figures) {
                 break;
             }
             // check if next tile already occupied by another figure
-            // if (temp_fig.length != 1) {
                 for (let k = i + 1; k < temp_fig.length; k++) {
                     for (let l = 0; l < temp_fig[k].cubes.length; l++) {
                         let other_x = temp_fig[k].cubes[l].x;
@@ -96,6 +95,7 @@ function move_down(figures) {
                 temp_new_cubes.push(temp_cube);
             }
         }
+        // if figure can be moved down by one row
         if (!(occupied)) {
             for (let k = 0; k < temp_fig[i].cubes.length; k++) {
                 // clear cube drawing for the figure
@@ -152,11 +152,13 @@ function create_cube(x, y, size, color, id) {
     ctx.fillStyle = color;
     // ctx.strokeStyle = color;
     // noStroke();
-    var fillRect = true;
-    ctx.rect(x, y, size, size);
-    if (fillRect) {
-        ctx.fill();
-    }
+    // var fillRect = true;
+    // ctx.rect(x, y, size, size);
+    // if (fillRect) {
+    //     ctx.fill();
+    // }
+
+    ctx.fillRect(x, y, size, size);
     ctx.stroke();
     // occupied_tiles.push([x,y]);
     return cube;
