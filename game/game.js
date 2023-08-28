@@ -55,6 +55,7 @@ figures -> array of figure objects
 */
 
 function move_down(figures) {
+    // console.log(fig);
     let temp_fig = fig.slice();
     let temp_cubes = cubes.slice();
     let temp_new_cubes = new Array();
@@ -62,12 +63,16 @@ function move_down(figures) {
     for (let i = 0; i < temp_fig.length; i++) {
         let occupied = false;
         for (let j = 0; j < temp_fig[i].cubes.length; j++) {
-            // check if tile for new position is occupied by a different figure
+            // check if tile for new position is occupied by a different figure or bottom reached
             let current_new_x = temp_fig[i].cubes[j].x;
             let current_new_y = temp_fig[i].cubes[j].y + 60;
-
+            // square is drawed from top line
+            if (current_new_y - 60 >= 720) {
+                occupied = true;
+                break;
+            }
             // check if next tile already occupied by another figure
-            if (temp_fig.length != 1) {
+            // if (temp_fig.length != 1) {
                 for (let k = i + 1; k < temp_fig.length; k++) {
                     for (let l = 0; l < temp_fig[k].cubes.length; l++) {
                         let other_x = temp_fig[k].cubes[l].x;
@@ -82,8 +87,6 @@ function move_down(figures) {
                         break;
                     }
                 }
-            }
-
             if (occupied) {
                 break;
             } else {
@@ -116,88 +119,6 @@ function move_down(figures) {
     }
 }
 
-
-
-// // clear cube drawing
-// ctx.clearRect(temp_fig[i].cubes[j].x, temp_fig[i].cubes[j].y, temp_fig[i].cubes[j].size, temp_fig[i].cubes[j].size);
-
-
-
-
-//         if (!(occupied)) {
-//             // create new cubes in new coordinates of current figure and remove current ones
-//             for (let l = 0; l < temp_fig[i].cubes.length; l++) {
-//                 ctx.clearRect(fig[i].cubes[l].x, fig[i].cubes[l].y, fig[i].cubes[l].size, fig[i].cubes[l].size);
-//                 // print(l);
-//                 // create_cube(fig[i].cubes[l].x, fig[i].cubes[l].y + 60, size, fig[i].cubes[l].color, fig[i].cubes[l].id);
-
-//                 // update position of cubes in all arrays
-//                 for (let m = 0; m < temp_cubes.length; m++) {
-//                     if (temp_fig[i].cubes[l].x == temp_cubes[m].x && temp_fig[i].cubes[l].y == temp_cubes[m].y) {
-//                         cubes[m].y = cubes[m].y + 60;
-//                     }
-//                 }
-
-//                 for (let m = 0; m < temp_occupied_tiles.length; m++) {
-//                     if (temp_fig[i].cubes[l].x == temp_occupied_tiles[m][0] && temp_fig[i].cubes[l].y == temp_occupied_tiles[m][1]) {
-//                         occupied_tiles[m][1] = occupied_tiles[m][1] + 60;
-//                     }
-//                 }
-//             }
-//         }
-//         occupied = false;
-//     }
-
-//     for (let i = 0; i < temp_fig.length; i++) {
-//         for (let j = 0; j < temp_fig[i].cubes; j++) {
-//             for (let k = 0; k < temp_occupied_tiles.length; k++) {
-//                 if (temp_fig[i].cubes[j].x == temp_occupied_tiles[k][0] && temp_fig[i].cubes[j].y == temp_occupied_tiles[k][1]) {
-//                     fig[i].cubes[j].y = fig[i].cubes[j].y + 60;
-//                 }
-//             }
-//         }
-//     }
-// }
-
-//     if (occupied == false) {
-//         console.log(temp_fig[0].cubes);
-//         for (let l = 0; l < temp_fig[i].cubes.length; l++) {
-//             // console.log('occupied');
-//             create_cube(temp_fig[i].cubes[l].x, temp_fig[i].cubes[l].y + 60, size, temp_fig[i].cubes[l].color, temp_fig[i].cubes[l].id);
-//             // update cubes with new coordinates in arrays
-//             for (let m = 0; m < temp_cubes.length; m++) {
-//                 if (temp_fig[i].cubes[l].x == temp_cubes[m].x && temp_fig[i].cubes[l].y == temp_cubes[m].y) {
-//                     cubes[m].y += 60;
-//                     clear(temp_cubes[m]);
-//                 }
-//             }
-
-//             for (let m = 0; m < temp_occupied_tiles.length; m++) {
-//                 // console.log(temp_fig[i].cubes[l].x);
-//                 // console.log(temp_occupied_tiles[m][0]);
-//                 // console.log(temp_fig[i].cubes[l].y);
-//                 // console.log(temp_occupied_tiles[m][1]);
-//                 // console.log('------------');
-//                 if (temp_fig[i].cubes[l].x == temp_occupied_tiles[m][0] && temp_fig[i].cubes[l].y == temp_occupied_tiles[m][1]) {
-//                     occupied_tiles[m][1] += 60;
-//                 }
-//             }
-//         }
-//     }
-//     occupied = false;
-// }
-
-// for (let i = 0; i < temp_fig.length; i++) {
-//     for (let j = 0; j < temp_fig[i].cubes; j++) {
-//         for (let k = 0; k < temp_occupied_tiles.length; k++) {
-//             if (temp_fig[i].cubes[j].x == temp_occupied_tiles[k][0] && temp_fig[i].cubes[j].y == temp_occupied_tiles[k][1]) {
-//                 fig[i].cubes[j].y += 60;
-//             }
-//         }
-//     }
-// }
-// }
-
 function rotate_left() {
 
 }
@@ -229,9 +150,10 @@ function create_cube(x, y, size, color, id) {
     }
     ctx.beginPath();
     ctx.fillStyle = color;
-    // ctx.strokeStyle = 'black';
+    // ctx.strokeStyle = color;
+    // noStroke();
     var fillRect = true;
-    ctx.rect(x, y, size, size, color);
+    ctx.rect(x, y, size, size);
     if (fillRect) {
         ctx.fill();
     }
