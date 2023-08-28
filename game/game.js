@@ -6,8 +6,8 @@ const ctx = canvas.getContext("2d");
 const size = 60;
 const colors = new Array('yellow', 'orange', 'red', 'green', 'blue', 'aqua', 'purple')
 // call function for given shape
-const tetrominoes = {"I" : I_shape, "O" : O_shape, "T" : T_shape, "S" : S_shape, "Z" : Z_shape, "L" : L_shape, "J" : J_shape};
-const x_coord = new Array(0,60,120,180,240,300,360,420,480,540);
+const tetrominoes = { "I": I_shape, "O": O_shape, "T": T_shape, "S": S_shape, "Z": Z_shape, "L": L_shape, "J": J_shape };
+const x_coord = new Array(0, 60, 120, 180, 240, 300, 360, 420, 480, 540);
 
 var cubes = new Array();
 var fig = new Array();
@@ -45,7 +45,7 @@ function figures(tetrominoes, size, x_coord, colors, cubes) {
     let val = tetrominoes[rnd_key];
     val(init_coord_x, size, color, cubes);
     // move all figures down every 1 second
-    setInterval(() => move_fig(fig), 1000);
+    setInterval(() => move_down(fig), 1000);
 }
 
 /*
@@ -53,112 +53,149 @@ Move down by one tile each figure in game window
 Param:
 figures -> array of figure objects
 */
-function move_fig(figures) {
-    // remove from fig, cubes and occupied_tiles
+
+function move_down(figures) {
     let temp_fig = fig.slice();
     let temp_cubes = cubes.slice();
-    let temp_occupied_tiles = occupied_tiles.slice();
-    // console.log(cubes);
-    // cubes = new Array();
-    // occupied_tiles = new Array();
-    console.log(temp_fig);
+    let temp_new_cubes = new Array();
+
     for (let i = 0; i < temp_fig.length; i++) {
-        // OCCUPIED IS MORE COMPLEX -> SHOW OCCUPIED FOR SQUARE BECAUSE BELOW ROW IS OCCUPIED
         let occupied = false;
         for (let j = 0; j < temp_fig[i].cubes.length; j++) {
             // check if tile for new position is occupied by a different figure
             let current_new_x = temp_fig[i].cubes[j].x;
             let current_new_y = temp_fig[i].cubes[j].y + 60;
-            // console.log(temp_fig[i].cubes.length);
+
+            // check if next tile already occupied by another figure
             if (temp_fig.length != 1) {
-                
-                for (let k = j + 1; k < temp_fig[i].cubes.length; k++) {
-                    let other_new_x = temp_fig[i].cubes[k].x;
-                    let other_new_y = temp_fig[i].cubes[k].y + 60;
-    
-                    if (current_new_x == other_new_x && current_new_y == other_new_y) {
-                        console.log('OCCUPIED');
-                        occupied = true;
+                for (let k = i + 1; k < temp_fig.length; k++) {
+                    for (let l = 0; l < temp_fig[k].cubes.length; l++) {
+                        let other_x = temp_fig[k].cubes[l].x;
+                        let other_y = temp_fig[k].cubes[l].y;
+
+                        if (current_new_x == other_x && current_new_y == other_y) {
+                            occupied = true;
+                            break;
+                        }
+                    }
+                    if (occupied) {
                         break;
                     }
                 }
             }
+
             if (occupied) {
                 break;
+            } else {
+                // save cubes with new y position
+                temp_cube = Object.assign({}, temp_fig[i].cubes[j]);
+                temp_cube.y = temp_cube.y + 60;
+                temp_new_cubes.push(temp_cube);
             }
         }
         if (!(occupied)) {
-            console.log('entered');
-            // create new cubes in new coordinates of current figure and remove current ones
-            for (let l = 0; l < temp_fig[i].cubes.length; l++) {
-                clear(temp_fig[i].cubes[l]);
-                create_cube(temp_fig[i].cubes[l].x, temp_fig[i].cubes[l].y + 60, size, temp_fig[i].cubes[l].color, temp_fig[i].cubes[l].id);
+            for (let k = 0; k < temp_fig[i].cubes.length; k++) {
+                // clear cube drawing for the figure
+                ctx.clearRect(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].size);
+            }
+            // add new cubes
+            fig[i].cubes = temp_new_cubes;
+            for (let k = 0; k < fig[i].cubes.length; k++) {
+                // draw cubes with new coordinates
+                create_cube(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].color, fig[i].cubes[k].id)
 
-                // update position of cubes in all arrays
+                // update cubes in cubes array
                 for (let m = 0; m < temp_cubes.length; m++) {
-                    if (temp_fig[i].cubes[l].x == temp_cubes[m].x && temp_fig[i].cubes[l].y == temp_cubes[m].y) {
+                    if (fig[i].cubes[k].x == temp_cubes[m].x && fig[i].cubes[k].y == temp_cubes[m].y + 60) {
                         cubes[m].y += 60;
-                    }
-                }
-
-                for (let m = 0; m < temp_occupied_tiles.length; m++) {
-                    if (temp_fig[i].cubes[l].x == temp_occupied_tiles[m][0] && temp_fig[i].cubes[l].y == temp_occupied_tiles[m][1]) {
-                        occupied_tiles[m][1] += 60;
                     }
                 }
             }
         }
         occupied = false;
     }
-
-    for (let i = 0; i < temp_fig.length; i++) {
-        for (let j = 0; j < temp_fig[i].cubes; j++) {
-            for (let k = 0; k < temp_occupied_tiles.length; k++) {
-                if (temp_fig[i].cubes[j].x == temp_occupied_tiles[k][0] && temp_fig[i].cubes[j].y == temp_occupied_tiles[k][1]) {
-                    fig[i].cubes[j].y += 60;
-                }
-            }
-        }
-    }
 }
 
-    //     if (occupied == false) {
-    //         console.log(temp_fig[0].cubes);
-    //         for (let l = 0; l < temp_fig[i].cubes.length; l++) {
-    //             // console.log('occupied');
-    //             create_cube(temp_fig[i].cubes[l].x, temp_fig[i].cubes[l].y + 60, size, temp_fig[i].cubes[l].color, temp_fig[i].cubes[l].id);
-    //             // update cubes with new coordinates in arrays
-    //             for (let m = 0; m < temp_cubes.length; m++) {
-    //                 if (temp_fig[i].cubes[l].x == temp_cubes[m].x && temp_fig[i].cubes[l].y == temp_cubes[m].y) {
-    //                     cubes[m].y += 60;
-    //                     clear(temp_cubes[m]);
-    //                 }
-    //             }
 
-    //             for (let m = 0; m < temp_occupied_tiles.length; m++) {
-    //                 // console.log(temp_fig[i].cubes[l].x);
-    //                 // console.log(temp_occupied_tiles[m][0]);
-    //                 // console.log(temp_fig[i].cubes[l].y);
-    //                 // console.log(temp_occupied_tiles[m][1]);
-    //                 // console.log('------------');
-    //                 if (temp_fig[i].cubes[l].x == temp_occupied_tiles[m][0] && temp_fig[i].cubes[l].y == temp_occupied_tiles[m][1]) {
-    //                     occupied_tiles[m][1] += 60;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     occupied = false;
-    // }
 
-    // for (let i = 0; i < temp_fig.length; i++) {
-    //     for (let j = 0; j < temp_fig[i].cubes; j++) {
-    //         for (let k = 0; k < temp_occupied_tiles.length; k++) {
-    //             if (temp_fig[i].cubes[j].x == temp_occupied_tiles[k][0] && temp_fig[i].cubes[j].y == temp_occupied_tiles[k][1]) {
-    //                 fig[i].cubes[j].y += 60;
-    //             }
-    //         }
-    //     }
-    // }
+// // clear cube drawing
+// ctx.clearRect(temp_fig[i].cubes[j].x, temp_fig[i].cubes[j].y, temp_fig[i].cubes[j].size, temp_fig[i].cubes[j].size);
+
+
+
+
+//         if (!(occupied)) {
+//             // create new cubes in new coordinates of current figure and remove current ones
+//             for (let l = 0; l < temp_fig[i].cubes.length; l++) {
+//                 ctx.clearRect(fig[i].cubes[l].x, fig[i].cubes[l].y, fig[i].cubes[l].size, fig[i].cubes[l].size);
+//                 // print(l);
+//                 // create_cube(fig[i].cubes[l].x, fig[i].cubes[l].y + 60, size, fig[i].cubes[l].color, fig[i].cubes[l].id);
+
+//                 // update position of cubes in all arrays
+//                 for (let m = 0; m < temp_cubes.length; m++) {
+//                     if (temp_fig[i].cubes[l].x == temp_cubes[m].x && temp_fig[i].cubes[l].y == temp_cubes[m].y) {
+//                         cubes[m].y = cubes[m].y + 60;
+//                     }
+//                 }
+
+//                 for (let m = 0; m < temp_occupied_tiles.length; m++) {
+//                     if (temp_fig[i].cubes[l].x == temp_occupied_tiles[m][0] && temp_fig[i].cubes[l].y == temp_occupied_tiles[m][1]) {
+//                         occupied_tiles[m][1] = occupied_tiles[m][1] + 60;
+//                     }
+//                 }
+//             }
+//         }
+//         occupied = false;
+//     }
+
+//     for (let i = 0; i < temp_fig.length; i++) {
+//         for (let j = 0; j < temp_fig[i].cubes; j++) {
+//             for (let k = 0; k < temp_occupied_tiles.length; k++) {
+//                 if (temp_fig[i].cubes[j].x == temp_occupied_tiles[k][0] && temp_fig[i].cubes[j].y == temp_occupied_tiles[k][1]) {
+//                     fig[i].cubes[j].y = fig[i].cubes[j].y + 60;
+//                 }
+//             }
+//         }
+//     }
+// }
+
+//     if (occupied == false) {
+//         console.log(temp_fig[0].cubes);
+//         for (let l = 0; l < temp_fig[i].cubes.length; l++) {
+//             // console.log('occupied');
+//             create_cube(temp_fig[i].cubes[l].x, temp_fig[i].cubes[l].y + 60, size, temp_fig[i].cubes[l].color, temp_fig[i].cubes[l].id);
+//             // update cubes with new coordinates in arrays
+//             for (let m = 0; m < temp_cubes.length; m++) {
+//                 if (temp_fig[i].cubes[l].x == temp_cubes[m].x && temp_fig[i].cubes[l].y == temp_cubes[m].y) {
+//                     cubes[m].y += 60;
+//                     clear(temp_cubes[m]);
+//                 }
+//             }
+
+//             for (let m = 0; m < temp_occupied_tiles.length; m++) {
+//                 // console.log(temp_fig[i].cubes[l].x);
+//                 // console.log(temp_occupied_tiles[m][0]);
+//                 // console.log(temp_fig[i].cubes[l].y);
+//                 // console.log(temp_occupied_tiles[m][1]);
+//                 // console.log('------------');
+//                 if (temp_fig[i].cubes[l].x == temp_occupied_tiles[m][0] && temp_fig[i].cubes[l].y == temp_occupied_tiles[m][1]) {
+//                     occupied_tiles[m][1] += 60;
+//                 }
+//             }
+//         }
+//     }
+//     occupied = false;
+// }
+
+// for (let i = 0; i < temp_fig.length; i++) {
+//     for (let j = 0; j < temp_fig[i].cubes; j++) {
+//         for (let k = 0; k < temp_occupied_tiles.length; k++) {
+//             if (temp_fig[i].cubes[j].x == temp_occupied_tiles[k][0] && temp_fig[i].cubes[j].y == temp_occupied_tiles[k][1]) {
+//                 fig[i].cubes[j].y += 60;
+//             }
+//         }
+//     }
+// }
 // }
 
 function rotate_left() {
@@ -182,34 +219,32 @@ y -> y position
 size -> cube's size
 color -> cube's color
 */
-function create_cube(x,y,size, color, id) {
+function create_cube(x, y, size, color, id) {
     // build cube object
     if (id == null) {
-        var cube = {x:x, y:y, size:size, color:color, id: cube_id};
+        var cube = { x: x, y: y, size: size, color: color, id: cube_id };
         cube_id++;
     } else {
-        var cube = {x:x, y:y, size:size, color:color, id: id};
+        var cube = { x: x, y: y, size: size, color: color, id: id };
     }
     ctx.beginPath();
-    // ctx.fillStyle = color;
-    // ctx.fillRect(x,y, size, size);
     ctx.fillStyle = color;
-    ctx.strokeStyle = 'black';
+    // ctx.strokeStyle = 'black';
     var fillRect = true;
-    ctx.rect(x, y, size, size);
+    ctx.rect(x, y, size, size, color);
     if (fillRect) {
-    ctx.fill();
+        ctx.fill();
     }
     ctx.stroke();
-    occupied_tiles.push([x,y]);
+    // occupied_tiles.push([x,y]);
     return cube;
 }
 
 function I_shape(x, size, color, cubes) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
-    for (let i = 0; i <= 60*3; i += 60) {
-        if (x + 3*60 <= 540) {
+    for (let i = 0; i <= 60 * 3; i += 60) {
+        if (x + 3 * 60 <= 540) {
             new_cube = create_cube(x + i, 0, size, color);
         } else {
             new_cube = create_cube(x - i, 0, size, color);
@@ -217,7 +252,7 @@ function I_shape(x, size, color, cubes) {
         cubes.push(new_cube);
         temp_fig_cubes.push(new_cube);
     }
-    var figure = {shape : "I", cubes : temp_fig_cubes, id : fig_id};
+    var figure = { shape: "I", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
 
@@ -233,11 +268,11 @@ function O_shape(x, size, color, cubes) {
             } else {
                 new_cube = create_cube(x - i, j, size, color);
             }
-            cubes.push(new_cube); 
+            cubes.push(new_cube);
             temp_fig_cubes.push(new_cube);
         }
     }
-    var figure = {shape : "O", cubes : temp_fig_cubes, id : fig_id};
+    var figure = { shape: "O", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
 }
@@ -245,8 +280,8 @@ function O_shape(x, size, color, cubes) {
 function T_shape(x, size, color, cubes) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
-    for (let i = 0; i <= 60*2; i += 60) {
-        if (x + 60*2 <= 540) {
+    for (let i = 0; i <= 60 * 2; i += 60) {
+        if (x + 60 * 2 <= 540) {
             new_cube = create_cube(x + i, 0, size, color);
             cubes.push(new_cube);
             temp_fig_cubes.push(new_cube);
@@ -255,16 +290,16 @@ function T_shape(x, size, color, cubes) {
             }
         } else {
             new_cube = create_cube(x - i, 0, size, color);
-            cubes.push(new_cube); 
+            cubes.push(new_cube);
             temp_fig_cubes.push(new_cube);
             if (i <= 60) {
                 new_cube = create_cube(x - 60, i, size, color);
             }
         }
-        cubes.push(new_cube); 
+        cubes.push(new_cube);
         temp_fig_cubes.push(new_cube);
     }
-    var figure = {shape : "T", cubes : temp_fig_cubes, id : fig_id};
+    var figure = { shape: "T", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
 }
@@ -272,11 +307,11 @@ function T_shape(x, size, color, cubes) {
 function S_shape(x, size, color, cubes) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
-    for (let i = 0; i <= 60*2; i += 60) {
-        if (x + 60*2 <= 540) {
+    for (let i = 0; i <= 60 * 2; i += 60) {
+        if (x + 60 * 2 <= 540) {
             if (i == 0) {
                 new_cube = create_cube(x, 60, size, color);
-                cubes.push(new_cube); 
+                cubes.push(new_cube);
                 temp_fig_cubes.push(new_cube);
             } else if (i == 60) {
                 new_cube = create_cube(x + i, 60, size, color);
@@ -293,7 +328,7 @@ function S_shape(x, size, color, cubes) {
         } else {
             if (i == 0) {
                 new_cube = create_cube(x, 0, size, color);
-                cubes.push(new_cube); 
+                cubes.push(new_cube);
                 temp_fig_cubes.push(new_cube);
             } else if (i == 60) {
                 new_cube = create_cube(x - i, 0, size, color);
@@ -309,7 +344,7 @@ function S_shape(x, size, color, cubes) {
             }
         }
     }
-    var figure = {shape : "S", cubes : temp_fig_cubes, id : fig_id};
+    var figure = { shape: "S", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
 }
@@ -317,11 +352,11 @@ function S_shape(x, size, color, cubes) {
 function Z_shape(x, size, color, cubes) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
-    for (let i = 0; i <= 60*2; i += 60) {
-        if (x + 60*2 <= 540) {
+    for (let i = 0; i <= 60 * 2; i += 60) {
+        if (x + 60 * 2 <= 540) {
             if (i == 0) {
                 new_cube = create_cube(x, 0, size, color);
-                cubes.push(new_cube); 
+                cubes.push(new_cube);
                 temp_fig_cubes.push(new_cube);
             } else if (i == 60) {
                 new_cube = create_cube(x + i, 0, size, color);
@@ -338,7 +373,7 @@ function Z_shape(x, size, color, cubes) {
         } else {
             if (i == 0) {
                 new_cube = create_cube(x, 60, size, color);
-                cubes.push(new_cube); 
+                cubes.push(new_cube);
                 temp_fig_cubes.push(new_cube);
             } else if (i == 60) {
                 new_cube = create_cube(x - i, 60, size, color);
@@ -354,7 +389,7 @@ function Z_shape(x, size, color, cubes) {
             }
         }
     }
-    var figure = {shape : "Z", cubes : temp_fig_cubes, id : fig_id};
+    var figure = { shape: "Z", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
 }
@@ -362,8 +397,8 @@ function Z_shape(x, size, color, cubes) {
 function L_shape(x, size, color, cubes) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
-    for (let i = 0; i <= 60*2; i += 60) {
-        if (x + 60*2 <= 540) {
+    for (let i = 0; i <= 60 * 2; i += 60) {
+        if (x + 60 * 2 <= 540) {
             new_cube = create_cube(x + i, 60, size, color);
             cubes.push(new_cube);
             temp_fig_cubes.push(new_cube);
@@ -371,7 +406,7 @@ function L_shape(x, size, color, cubes) {
                 new_cube = create_cube(x + i, 0, size, color);
                 cubes.push(new_cube);
                 temp_fig_cubes.push(new_cube);
-            } 
+            }
         } else {
             new_cube = create_cube(x - i, 60, size, color);
             cubes.push(new_cube);
@@ -380,10 +415,10 @@ function L_shape(x, size, color, cubes) {
                 new_cube = create_cube(x, 0, size, color);
                 cubes.push(new_cube);
                 temp_fig_cubes.push(new_cube);
-            } 
-        }  
+            }
+        }
     }
-    var figure = {shape : "L", cubes : temp_fig_cubes, id : fig_id};
+    var figure = { shape: "L", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
 }
@@ -391,8 +426,8 @@ function L_shape(x, size, color, cubes) {
 function J_shape(x, size, color, cubes) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
-    for (let i = 0; i <= 60*2; i += 60) {
-        if (x + 60*2 <= 540) {
+    for (let i = 0; i <= 60 * 2; i += 60) {
+        if (x + 60 * 2 <= 540) {
             new_cube = create_cube(x + i, 60, size, color);
             cubes.push(new_cube);
             temp_fig_cubes.push(new_cube);
@@ -400,7 +435,7 @@ function J_shape(x, size, color, cubes) {
                 new_cube = create_cube(x, 0, size, color);
                 cubes.push(new_cube);
                 temp_fig_cubes.push(new_cube);
-            } 
+            }
         } else {
             new_cube = create_cube(x - i, 60, size, color);
             cubes.push(new_cube);
@@ -409,10 +444,10 @@ function J_shape(x, size, color, cubes) {
                 new_cube = create_cube(x - i, 0, size, color);
                 cubes.push(new_cube);
                 temp_fig_cubes.push(new_cube);
-            } 
-        }  
+            }
+        }
     }
-    var figure = {shape : "J", cubes : temp_fig_cubes, id : fig_id};
+    var figure = { shape: "J", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
 }
