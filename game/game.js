@@ -7,7 +7,7 @@ const size = 60;
 const colors = new Array('yellow', 'orange', 'red', 'green', 'blue', 'aqua', 'purple')
 // call function for given shape
 const tetrominoes = { "I": I_shape, "O": O_shape, "T": T_shape, "S": S_shape, "Z": Z_shape, "L": L_shape, "J": J_shape };
-const x_coord = new Array(0, 60, 120, 180, 240, 300, 360, 420, 480, 540);
+const x_coords = new Array(0, 60, 120, 180, 240, 300, 360, 420, 480, 540);
 
 var cubes = new Array();
 var fig = new Array();
@@ -22,7 +22,7 @@ var current_state = 'move';
 function run() {
 
     // continue to call
-    figures(tetrominoes, size, x_coord, colors, cubes);
+    figures(tetrominoes);
     // I_shape(cubes, x_coord);
     // setInterval(() => {
     //     cube = move(cube);
@@ -37,18 +37,27 @@ tetromino -> random figure shape to create
 cube -> cube object 
 cubes -> array of cube objects
 */
-function figures(tetrominoes, size, x_coord, colors, cubes) {
+function figures(tetrominoes) {
+
+    // call first random tetromino shape function
+    create_fig();
+    // move all figures down every 1 second
+    setInterval(move_down, 1000);
+}
+
+/*
+Create a figure
+Param:
+init_coord_x -> array of figure objects
+*/
+function create_fig() {
     let color = colors[Math.floor(Math.random() * colors.length)];
+    let init_coord_x = x_coords[Math.floor(Math.random() * x_coords.length)];
 
-    let init_coord_x = x_coord[Math.floor(Math.random() * x_coord.length)];
-
-    // call random tetromino shape function
     const keysArray = Object.keys(tetrominoes);
     const rnd_key = keysArray[Math.floor(Math.random() * keysArray.length)];
     let val = tetrominoes[rnd_key];
-    current_fig = val(init_coord_x, size, color, cubes);
-    // move all figures down every 1 second
-    setInterval(move_down, 1000);
+    current_fig = val(init_coord_x, color, cubes);
 }
 
 /*
@@ -58,7 +67,6 @@ figures -> array of figure objects
 */
 
 function move_down() {
-    console.log(current_state);
     let temp_fig = fig.slice();
     let temp_cubes = cubes.slice();
     let temp_new_cubes = new Array();
@@ -124,6 +132,9 @@ function move_down() {
         }
         occupied = false;
     }
+    if (current_state == 'stop') {
+
+    }
 }
 
 function rotate_left() {
@@ -171,7 +182,7 @@ function create_cube(x, y, size, color, id) {
     return cube;
 }
 
-function I_shape(x, size, color, cubes) {
+function I_shape(x, color) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
     for (let i = 0; i <= 60 * 3; i += 60) {
@@ -190,7 +201,7 @@ function I_shape(x, size, color, cubes) {
 
 }
 
-function O_shape(x, size, color, cubes) {
+function O_shape(x, color) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
     for (let i = 0; i <= 60; i += 60) {
@@ -210,7 +221,7 @@ function O_shape(x, size, color, cubes) {
     return figure;
 }
 
-function T_shape(x, size, color, cubes) {
+function T_shape(x, color) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
     for (let i = 0; i <= 60 * 2; i += 60) {
@@ -238,7 +249,7 @@ function T_shape(x, size, color, cubes) {
     return figure;
 }
 
-function S_shape(x, size, color, cubes) {
+function S_shape(x, color) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
     for (let i = 0; i <= 60 * 2; i += 60) {
@@ -284,7 +295,7 @@ function S_shape(x, size, color, cubes) {
     return figure;
 }
 
-function Z_shape(x, size, color, cubes) {
+function Z_shape(x, color) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
     for (let i = 0; i <= 60 * 2; i += 60) {
@@ -330,7 +341,7 @@ function Z_shape(x, size, color, cubes) {
     return figure;
 }
 
-function L_shape(x, size, color, cubes) {
+function L_shape(x, color) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
     for (let i = 0; i <= 60 * 2; i += 60) {
@@ -360,7 +371,7 @@ function L_shape(x, size, color, cubes) {
     return figure;
 }
 
-function J_shape(x, size, color, cubes) {
+function J_shape(x, color) {
     let new_cube = {};
     let temp_fig_cubes = new Array();
     for (let i = 0; i <= 60 * 2; i += 60) {
