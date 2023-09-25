@@ -16,6 +16,9 @@ var occupied_tiles = new Array();
 var cube_id = 0;
 var fig_id = 0;
 
+var current_fig = null;
+var current_state = 'move';
+
 function run() {
 
     // continue to call
@@ -43,9 +46,9 @@ function figures(tetrominoes, size, x_coord, colors, cubes) {
     const keysArray = Object.keys(tetrominoes);
     const rnd_key = keysArray[Math.floor(Math.random() * keysArray.length)];
     let val = tetrominoes[rnd_key];
-    val(init_coord_x, size, color, cubes);
+    current_fig = val(init_coord_x, size, color, cubes);
     // move all figures down every 1 second
-    setInterval(() => move_down(fig), 1000);
+    setInterval(move_down, 1000);
 }
 
 /*
@@ -54,8 +57,8 @@ Param:
 figures -> array of figure objects
 */
 
-function move_down(figures) {
-    // console.log(fig);
+function move_down() {
+    console.log(current_state);
     let temp_fig = fig.slice();
     let temp_cubes = cubes.slice();
     let temp_new_cubes = new Array();
@@ -69,6 +72,7 @@ function move_down(figures) {
             // square is drawed from top line
             if (current_new_y - 60 >= 720) {
                 occupied = true;
+                current_state = 'stop';
                 break;
             }
             // check if next tile already occupied by another figure
@@ -79,14 +83,17 @@ function move_down(figures) {
 
                         if (current_new_x == other_x && current_new_y == other_y) {
                             occupied = true;
+                            current_state = 'stop';
                             break;
                         }
                     }
                     if (occupied) {
+                        current_state = 'stop';
                         break;
                     }
                 }
             if (occupied) {
+                current_state = 'stop';
                 break;
             } else {
                 // save cubes with new y position
@@ -179,6 +186,7 @@ function I_shape(x, size, color, cubes) {
     var figure = { shape: "I", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
+    return figure;
 
 }
 
@@ -199,6 +207,7 @@ function O_shape(x, size, color, cubes) {
     var figure = { shape: "O", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
+    return figure;
 }
 
 function T_shape(x, size, color, cubes) {
@@ -226,6 +235,7 @@ function T_shape(x, size, color, cubes) {
     var figure = { shape: "T", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
+    return figure;
 }
 
 function S_shape(x, size, color, cubes) {
@@ -271,6 +281,7 @@ function S_shape(x, size, color, cubes) {
     var figure = { shape: "S", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
+    return figure;
 }
 
 function Z_shape(x, size, color, cubes) {
@@ -316,6 +327,7 @@ function Z_shape(x, size, color, cubes) {
     var figure = { shape: "Z", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
+    return figure;
 }
 
 function L_shape(x, size, color, cubes) {
@@ -345,6 +357,7 @@ function L_shape(x, size, color, cubes) {
     var figure = { shape: "L", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
+    return figure;
 }
 
 function J_shape(x, size, color, cubes) {
@@ -374,6 +387,7 @@ function J_shape(x, size, color, cubes) {
     var figure = { shape: "J", cubes: temp_fig_cubes, id: fig_id };
     fig_id++;
     fig.push(figure);
+    return figure;
 }
 
 run();
