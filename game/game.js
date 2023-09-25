@@ -7,7 +7,7 @@ const size = 60;
 const colors = new Array('yellow', 'orange', 'red', 'green', 'blue', 'aqua', 'purple')
 // call function for given shape
 const tetrominoes = { "I": I_shape, "O": O_shape, "T": T_shape, "S": S_shape, "Z": Z_shape, "L": L_shape, "J": J_shape };
-const x_coords = new Array(0, 60, 120, 180, 240, 300, 360, 420, 480, 540);
+const x_coords = new Array(60, 60, 120, 180, 240, 300, 360, 420, 480, 540);
 
 var cubes = new Array();
 var fig = new Array();
@@ -42,7 +42,7 @@ function figures(tetrominoes) {
     // call first random tetromino shape function
     create_fig();
     // move all figures down every 1 second
-    setInterval(move_down, 1000);
+    setInterval(() => check_move_down(current_fig), 1000);
 }
 
 /*
@@ -51,12 +51,15 @@ Param:
 init_coord_x -> array of figure objects
 */
 function create_fig() {
+    // random color
     let color = colors[Math.floor(Math.random() * colors.length)];
+    // random initial x coordinate
     let init_coord_x = x_coords[Math.floor(Math.random() * x_coords.length)];
 
     const keysArray = Object.keys(tetrominoes);
     const rnd_key = keysArray[Math.floor(Math.random() * keysArray.length)];
     let val = tetrominoes[rnd_key];
+    // call random shape function
     current_fig = val(init_coord_x, color, cubes);
 }
 
@@ -66,76 +69,120 @@ Param:
 figures -> array of figure objects
 */
 
-function move_down() {
-    let temp_fig = fig.slice();
-    let temp_cubes = cubes.slice();
-    let temp_new_cubes = new Array();
-
-    for (let i = 0; i < temp_fig.length; i++) {
-        let occupied = false;
-        for (let j = 0; j < temp_fig[i].cubes.length; j++) {
-            // check if tile for new position is occupied by a different figure or bottom reached
-            let current_new_x = temp_fig[i].cubes[j].x;
-            let current_new_y = temp_fig[i].cubes[j].y + 60;
-            // square is drawed from top line
-            if (current_new_y - 60 >= 720) {
+function check_move_down(figure) {
+    let bottom_cubes = new Array();
+    let bottom = -1;
+    // pick bottom cubes of the figure to check if they can move down 
+    for (let i = 0; i < figure.cubes; i++) {
+        if (figure.cubes[i].y >= bottom) {
+            bottom = figure.cubes[i].y;
+            bottom_cubes.push(figure.cubes[i]);
+        }
+    }
+    let occupied = false;
+    for (let i = 0; i < bottom_cubes.length; i++) {
+        let new_y = bottom_cubes[i].y + 60;
+        let coord = [bottom_cubes[i].x,new_y];
+        // check if new tile is already occupied by another block
+        for (var tile of occupied_tiles) {
+            if (JSON.stringify(coord) === JSON.stringify(tile)) {
                 occupied = true;
-                current_state = 'stop';
                 break;
             }
-            // check if next tile already occupied by another figure
-                for (let k = i + 1; k < temp_fig.length; k++) {
-                    for (let l = 0; l < temp_fig[k].cubes.length; l++) {
-                        let other_x = temp_fig[k].cubes[l].x;
-                        let other_y = temp_fig[k].cubes[l].y;
-
-                        if (current_new_x == other_x && current_new_y == other_y) {
-                            occupied = true;
-                            current_state = 'stop';
-                            break;
-                        }
-                    }
-                    if (occupied) {
-                        current_state = 'stop';
-                        break;
-                    }
-                }
-            if (occupied) {
-                current_state = 'stop';
-                break;
-            } else {
-                // save cubes with new y position
-                temp_cube = Object.assign({}, temp_fig[i].cubes[j]);
-                temp_cube.y = temp_cube.y + 60;
-                temp_new_cubes.push(temp_cube);
-            }
         }
-        // if figure can be moved down by one row
-        if (!(occupied)) {
-            for (let k = 0; k < temp_fig[i].cubes.length; k++) {
-                // clear cube drawing for the figure
-                ctx.clearRect(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].size);
-            }
-            // add new cubes
-            fig[i].cubes = temp_new_cubes;
-            for (let k = 0; k < fig[i].cubes.length; k++) {
-                // draw cubes with new coordinates
-                create_cube(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].color, fig[i].cubes[k].id)
-
-                // update cubes in cubes array
-                for (let m = 0; m < temp_cubes.length; m++) {
-                    if (fig[i].cubes[k].x == temp_cubes[m].x && fig[i].cubes[k].y == temp_cubes[m].y + 60) {
-                        cubes[m].y += 60;
-                    }
-                }
-            }
+        // check if bottom reached
+        if ((!occupied) && new_y >= 780) {
+            occupied = true;
+            break;
         }
-        occupied = false;
     }
-    if (current_state == 'stop') {
 
+    // if new coordinates are occupied, then don't move
+    // otherwise, move down
+    if (!occupied) {
+        update_pos(figure.cubes, 'current')
     }
+
+
+    
 }
+
+/*
+Update new position down for all arrays 
+Param:
+cubes -> cubes which have to move
+type -> type of cubes
+*/
+function update_pos(cubes, type) {
+
+}
+
+    // let temp_fig = fig.slice();
+    // let temp_cubes = cubes.slice();
+    // let temp_new_cubes = new Array();
+
+    // for (let i = 0; i < temp_fig.length; i++) {
+    //     let occupied = false;
+    //     for (let j = 0; j < temp_fig[i].cubes.length; j++) {
+    //         // check if tile for new position is occupied by a different figure or bottom reached
+    //         let current_new_x = temp_fig[i].cubes[j].x;
+    //         let current_new_y = temp_fig[i].cubes[j].y + 60;
+    //         // square is drawed from top line
+    //         if (current_new_y - 60 >= 720) {
+    //             occupied = true;
+    //             current_state = 'stop';
+    //             break;
+    //         }
+    //         // check if next tile already occupied by another figure
+    //             for (let k = i + 1; k < temp_fig.length; k++) {
+    //                 for (let l = 0; l < temp_fig[k].cubes.length; l++) {
+    //                     let other_x = temp_fig[k].cubes[l].x;
+    //                     let other_y = temp_fig[k].cubes[l].y;
+
+    //                     if (current_new_x == other_x && current_new_y == other_y) {
+    //                         occupied = true;
+    //                         current_state = 'stop';
+    //                         break;
+    //                     }
+    //                 }
+    //                 if (occupied) {
+    //                     current_state = 'stop';
+    //                     break;
+    //                 }
+    //             }
+    //         if (occupied) {
+    //             current_state = 'stop';
+    //             break;
+    //         } else {
+    //             // save cubes with new y position
+    //             temp_cube = Object.assign({}, temp_fig[i].cubes[j]);
+    //             temp_cube.y = temp_cube.y + 60;
+    //             temp_new_cubes.push(temp_cube);
+    //         }
+    //     }
+    //     // if figure can be moved down by one row
+    //     if (!(occupied)) {
+    //         for (let k = 0; k < temp_fig[i].cubes.length; k++) {
+    //             // clear cube drawing for the figure
+    //             ctx.clearRect(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].size);
+    //         }
+    //         // add new cubes
+    //         fig[i].cubes = temp_new_cubes;
+    //         for (let k = 0; k < fig[i].cubes.length; k++) {
+    //             // draw cubes with new coordinates
+    //             create_cube(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].color, fig[i].cubes[k].id)
+
+    //             // update cubes in cubes array
+    //             for (let m = 0; m < temp_cubes.length; m++) {
+    //                 if (fig[i].cubes[k].x == temp_cubes[m].x && fig[i].cubes[k].y == temp_cubes[m].y + 60) {
+    //                     cubes[m].y += 60;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     occupied = false;
+    // }
+// }
 
 function rotate_left() {
 
@@ -178,7 +225,7 @@ function create_cube(x, y, size, color, id) {
 
     ctx.fillRect(x, y, size, size);
     ctx.stroke();
-    // occupied_tiles.push([x,y]);
+    occupied_tiles.push([x,y]);
     return cube;
 }
 
