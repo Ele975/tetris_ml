@@ -82,7 +82,7 @@ function check_move_down(figure) {
     let occupied = false;
     for (let i = 0; i < bottom_cubes.length; i++) {
         let new_y = bottom_cubes[i].y + 60;
-        let coord = [bottom_cubes[i].x,new_y];
+        let coord = [bottom_cubes[i].x, new_y];
         // check if new tile is already occupied by another block
         for (var tile of occupied_tiles) {
             if (JSON.stringify(coord) === JSON.stringify(tile)) {
@@ -104,84 +104,102 @@ function check_move_down(figure) {
     }
 
 
-    
+
 }
 
 /*
-Update new position down for all arrays 
+Update new position down for all arrays . If type 'current_fig' passed, move down by one tile the moving figure
 Param:
 cubes -> cubes which have to move
 type -> type of cubes
 */
-function update_pos(cubes, type) {
+function update_pos(current_cubes, type) {
+    if (type == 'current_fig') {
+        for (let k = 0; k < current_cubes.length; k++) {
+            // clear figure current_cubes
+            ctx.clearRect(current_cubes[k].x, current_cubes[k].y, current_cubes[k].size, current_cubes[k].size);
+            // draw new figure current_cubes
+            create_cube(current_cubes[k].x, current_cubes[k].y + 60, current_cubes[k].size, current_cubes[k].color, current_cubes[k].id)
+            // update current_cubes in arrays
+            for (let i = 0; i < occupied_tiles; i++) {
+                if (current_cubes[k].x == occupied_tiles[i][0] && current_cubes[k].y[i][1]) {
+                    occupied_tiles[i][1] += 60;
+                    break;
+                }
+            }
+            for (let i = 0; i < cubes.length; i++) {
+                // ...
+            }
+        }
+    }
 
 }
 
-    // let temp_fig = fig.slice();
-    // let temp_cubes = cubes.slice();
-    // let temp_new_cubes = new Array();
+// let temp_fig = fig.slice();
+// let temp_cubes = cubes.slice();
+// let temp_new_cubes = new Array();
 
-    // for (let i = 0; i < temp_fig.length; i++) {
-    //     let occupied = false;
-    //     for (let j = 0; j < temp_fig[i].cubes.length; j++) {
-    //         // check if tile for new position is occupied by a different figure or bottom reached
-    //         let current_new_x = temp_fig[i].cubes[j].x;
-    //         let current_new_y = temp_fig[i].cubes[j].y + 60;
-    //         // square is drawed from top line
-    //         if (current_new_y - 60 >= 720) {
-    //             occupied = true;
-    //             current_state = 'stop';
-    //             break;
-    //         }
-    //         // check if next tile already occupied by another figure
-    //             for (let k = i + 1; k < temp_fig.length; k++) {
-    //                 for (let l = 0; l < temp_fig[k].cubes.length; l++) {
-    //                     let other_x = temp_fig[k].cubes[l].x;
-    //                     let other_y = temp_fig[k].cubes[l].y;
+// for (let i = 0; i < temp_fig.length; i++) {
+//     let occupied = false;
+//     for (let j = 0; j < temp_fig[i].cubes.length; j++) {
+//         // check if tile for new position is occupied by a different figure or bottom reached
+//         let current_new_x = temp_fig[i].cubes[j].x;
+//         let current_new_y = temp_fig[i].cubes[j].y + 60;
+//         // square is drawed from top line
+//         if (current_new_y - 60 >= 720) {
+//             occupied = true;
+//             current_state = 'stop';
+//             break;
+//         }
+//         // check if next tile already occupied by another figure
+//             for (let k = i + 1; k < temp_fig.length; k++) {
+//                 for (let l = 0; l < temp_fig[k].cubes.length; l++) {
+//                     let other_x = temp_fig[k].cubes[l].x;
+//                     let other_y = temp_fig[k].cubes[l].y;
 
-    //                     if (current_new_x == other_x && current_new_y == other_y) {
-    //                         occupied = true;
-    //                         current_state = 'stop';
-    //                         break;
-    //                     }
-    //                 }
-    //                 if (occupied) {
-    //                     current_state = 'stop';
-    //                     break;
-    //                 }
-    //             }
-    //         if (occupied) {
-    //             current_state = 'stop';
-    //             break;
-    //         } else {
-    //             // save cubes with new y position
-    //             temp_cube = Object.assign({}, temp_fig[i].cubes[j]);
-    //             temp_cube.y = temp_cube.y + 60;
-    //             temp_new_cubes.push(temp_cube);
-    //         }
-    //     }
-    //     // if figure can be moved down by one row
-    //     if (!(occupied)) {
-    //         for (let k = 0; k < temp_fig[i].cubes.length; k++) {
-    //             // clear cube drawing for the figure
-    //             ctx.clearRect(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].size);
-    //         }
-    //         // add new cubes
-    //         fig[i].cubes = temp_new_cubes;
-    //         for (let k = 0; k < fig[i].cubes.length; k++) {
-    //             // draw cubes with new coordinates
-    //             create_cube(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].color, fig[i].cubes[k].id)
+//                     if (current_new_x == other_x && current_new_y == other_y) {
+//                         occupied = true;
+//                         current_state = 'stop';
+//                         break;
+//                     }
+//                 }
+//                 if (occupied) {
+//                     current_state = 'stop';
+//                     break;
+//                 }
+//             }
+//         if (occupied) {
+//             current_state = 'stop';
+//             break;
+//         } else {
+//             // save cubes with new y position
+//             temp_cube = Object.assign({}, temp_fig[i].cubes[j]);
+//             temp_cube.y = temp_cube.y + 60;
+//             temp_new_cubes.push(temp_cube);
+//         }
+//     }
+//     // if figure can be moved down by one row
+//     if (!(occupied)) {
+//         for (let k = 0; k < temp_fig[i].cubes.length; k++) {
+//             // clear cube drawing for the figure
+//             ctx.clearRect(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].size);
+//         }
+//         // add new cubes
+//         fig[i].cubes = temp_new_cubes;
+//         for (let k = 0; k < fig[i].cubes.length; k++) {
+//             // draw cubes with new coordinates
+//             create_cube(fig[i].cubes[k].x, fig[i].cubes[k].y, fig[i].cubes[k].size, fig[i].cubes[k].color, fig[i].cubes[k].id)
 
-    //             // update cubes in cubes array
-    //             for (let m = 0; m < temp_cubes.length; m++) {
-    //                 if (fig[i].cubes[k].x == temp_cubes[m].x && fig[i].cubes[k].y == temp_cubes[m].y + 60) {
-    //                     cubes[m].y += 60;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     occupied = false;
-    // }
+//             // update cubes in cubes array
+//             for (let m = 0; m < temp_cubes.length; m++) {
+//                 if (fig[i].cubes[k].x == temp_cubes[m].x && fig[i].cubes[k].y == temp_cubes[m].y + 60) {
+//                     cubes[m].y += 60;
+//                 }
+//             }
+//         }
+//     }
+//     occupied = false;
+// }
 // }
 
 function rotate_left() {
@@ -225,7 +243,7 @@ function create_cube(x, y, size, color, id) {
 
     ctx.fillRect(x, y, size, size);
     ctx.stroke();
-    occupied_tiles.push([x,y]);
+    occupied_tiles.push([x, y]);
     return cube;
 }
 
