@@ -1,8 +1,7 @@
-// import {I_shape} from './shapes.js';
-
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
+// tile size
 const size = 60;
 const colors = new Array('yellow', 'orange', 'red', 'green', 'blue', 'aqua', 'purple')
 // call function for given shape
@@ -19,15 +18,25 @@ var current_state = 'move';
 function init() {
     // create init fig
     create_fig();
-    setInterval(() => run(), 1000);
+    // intervalId = setInterval(() => run(), 1000);
+    intervalId = setInterval(() => run(), 100);
 }
 
 function run() {
+    exit = false;
     bottom_reached = check_move_down();
     if (bottom_reached) {
-        create_fig();
+        for (let i = 0; i < current_cubes.length; i++) {
+            if (current_cubes[i].y <= 0) {
+                console.log('GAME OVER');
+                clearInterval(intervalId);
+                exit = true;
+            }
+        }
+        if (!exit) {
+            create_fig();
+        }
     }
-
 }
 
 /*
@@ -41,10 +50,10 @@ function create_fig() {
     // random initial x coordinate
     let init_coord_x = 240;
 
+    // call random shape function
     const keysArray = Object.keys(tetrominoes);
     const rnd_key = keysArray[Math.floor(Math.random() * keysArray.length)];
     let val = tetrominoes[rnd_key];
-    // call random shape function
     val(init_coord_x, color)
 }
 
@@ -172,7 +181,7 @@ function I_shape(x, color) {
     let temp_cubes = []
 
     for (i = x - 60; i <= x + 120; i += 60) {
-        new_cube = create_cube(i,0,size,color);
+        new_cube = create_cube(i,-60,size,color);
         cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }  
@@ -183,7 +192,7 @@ function O_shape(x, color) {
     let new_cube = {};
     let temp_cubes = []
     for (let i = x; i <= x + 60; i += 60) {
-        for (let j = 0; j <= 60; j += 60) {
+        for (let j = -60; j <= 0; j += 60) {
             new_cube = create_cube(i, j, size, color);
             cubes.push(new_cube);
             temp_cubes.push(new_cube)
@@ -197,11 +206,11 @@ function T_shape(x, color) {
     let temp_cubes = []
 
     for (let i = x - 60; i <= x + 60; i+= 60) {
-        new_cube = create_cube(i, 0, size, color);
+        new_cube = create_cube(i, -120, size, color);
         cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
-    new_cube = create_cube(x, 60, size, color);
+    new_cube = create_cube(x, -60, size, color);
     cubes.push(new_cube);
     temp_cubes.push(new_cube);
     current_cubes = temp_cubes;
@@ -211,12 +220,12 @@ function S_shape(x, color) {
     let new_cube = {};
     let temp_cubes = []
     for (let i = x; i <= x + 60; i += 60) {
-    new_cube = create_cube(i, 0, size, color);
+    new_cube = create_cube(i, -120, size, color);
     cubes.push(new_cube);
     temp_cubes.push(new_cube)
     }
     for (let i = x - 60; i <= x; i += 60) {
-    new_cube = create_cube(i, 60, size, color);
+    new_cube = create_cube(i, -60, size, color);
     cubes.push(new_cube);
     temp_cubes.push(new_cube)
     }
@@ -227,13 +236,13 @@ function Z_shape(x, color) {
     let new_cube = {};
     let temp_cubes = []
     for (let i = x - 60; i <= x; i += 60) {
-        new_cube = create_cube(i, 0, size, color);
+        new_cube = create_cube(i, -120, size, color);
         cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
 
     for (let i = x; i <= x + 60; i += 60) {
-        new_cube = create_cube(i, 60, size, color);
+        new_cube = create_cube(i, -60, size, color);
         cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
@@ -243,12 +252,12 @@ function Z_shape(x, color) {
 function L_shape(x, color) {
     let new_cube = {};
     let temp_cubes = []
-    for (let i = 0; i <= 120; i += 60) {
+    for (let i = -180; i <= -60; i += 60) {
         new_cube = create_cube(x, i, size, color);
         cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
-    new_cube = create_cube(x + 60, 120, size, color);
+    new_cube = create_cube(x + 60, -60, size, color);
     cubes.push(new_cube);
     temp_cubes.push(new_cube)
     current_cubes = temp_cubes;
@@ -257,12 +266,12 @@ function L_shape(x, color) {
 function J_shape(x, color) {
     let new_cube = {};
     let temp_cubes = []
-    for (let i = 0; i <= 120; i += 60) {
+    for (let i = -180; i <= -60; i += 60) {
         new_cube = create_cube(x, i, size, color);
         cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
-    new_cube = create_cube(x - 60, 120, size, color);
+    new_cube = create_cube(x - 60, -60, size, color);
     cubes.push(new_cube);
     temp_cubes.push(new_cube)
     current_cubes = temp_cubes;
