@@ -19,7 +19,7 @@ function init() {
     // create init fig
     create_fig();
     // intervalId = setInterval(() => run(), 1000);
-    intervalId = setInterval(() => run(), 500);
+    intervalId = setInterval(() => run(), 200);
 }
 
 function run() {
@@ -157,8 +157,8 @@ function update_pos(cubes_type, operation_type) {
         change_y = 0
     }
     for (let k = 0; k < cubes_type.length; k++) {
-        // clear previous figure positions
-        ctx.clearRect(cubes_type[k].x, cubes_type[k].y, cubes_type[k].size, cubes_type[k].size);
+        // clear previous cube's position area
+        ctx.clearRect(cubes_type[k].x - 1, cubes_type[k].y - 1, cubes_type[k].size + 2, cubes_type[k].size + 2);
         // update y positions in current_cubes array
         cubes_type[k].x += change_x
         cubes_type[k].y += change_y
@@ -186,18 +186,23 @@ function create_cube(x, y, size, color, id) {
     } else {
         var cube = { x: x, y: y, size: size, color: color, id: id };
     }
-    ctx.beginPath();
-    ctx.fillStyle = color;
-    // ctx.strokeStyle = color;
-    // noStroke();
-    // var fillRect = true;
-    // ctx.rect(x, y, size, size);
-    // if (fillRect) {
-    //     ctx.fill();
-    // }
+    // ctx.beginPath();
+    // ctx.fillStyle = color;
+    // // ctx.strokeStyle = color;
+    // // noStroke();
+    // // var fillRect = true;
+    // // ctx.rect(x, y, size, size);
+    // // if (fillRect) {
+    // //     ctx.fill();
+    // // }
+    ctx.fillStyle = color; // Set the fill color
+    ctx.fillRect(x, y, size, size); // Fill the cube with color
 
-    ctx.fillRect(x, y, size, size);
-    ctx.stroke();
+    ctx.strokeStyle = 'black'; // Set the border color
+    ctx.strokeRect(x, y, size, size); // Draw the border of the cube
+
+    // ctx.fillRect(x, y, size, size);
+    // ctx.stroke();
     return cube;
 }
 
@@ -336,7 +341,8 @@ function rotate_right() {
 }
 
 function clear(cube_obj) {
-    ctx.clearRect(cube_obj.x, cube_obj.y, cube_obj.size, cube_obj.size);
+    // ctx.clearRect(cube_obj.x, cube_obj.y, cube_obj.size, cube_obj.size);
+    ctx.clearRect(cube.x - 1, cube.y - 1, cube.size + 2, cube.size + 2);
 }
 
 function check_full_rows() {
@@ -366,7 +372,7 @@ function delete_full_row(y_coord) {
     let cubes_temp = []
     for (let i = 0; i < cubes.length; i++) {
         if (cubes[i].y == y_coord) {
-            ctx.clearRect(cubes[i].x, cubes[i].y, cubes[i].size, cubes[i].size);
+            ctx.clearRect(cubes[i].x - 1, cubes[i].y - 1, cubes[i].size + 2, cubes[i].size + 2);
         } else {
             cubes_temp.push(cubes[i])
         }
