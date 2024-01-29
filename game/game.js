@@ -21,7 +21,7 @@ function init() {
     // create init fig
     create_fig();
     // intervalId = setInterval(() => run(), 1000);
-    intervalId = setInterval(() => run(), 1000);
+    intervalId = setInterval(() => run(), 400);
 }
 
 function run() {
@@ -224,7 +224,7 @@ function O_shape(x, color) {
         }
     }
     current_cubes = temp_cubes;
-    origin = [x + 30, -30]
+    origin = [x + 30, -90]
 }
 
 function T_shape(x, color) {
@@ -378,29 +378,51 @@ function check_full_rows() {
             row_count[String(cubes[i].y)] = 1
         }
     }
+    rows_coord = []
     // find full rows (with 10 tiles)
     for (let key in row_count) {
         if (row_count[key] == 10) {
-            delete_full_row(parseInt(key))
+            rows_coord.push(parseInt(key))
         }
     }
+    delete_full_rows(parseInt(key))
 }
 
-function delete_full_row(y_coord) {
-    // delete all tiles in the given y coordinate
+function delete_full_rows(y_coords) {
+    // // delete all tiles in the given y coordinate
+    // let cubes_move = []
+    // let cubes_temp = []
+    // for (let i = 0; i < cubes.length; i++) {
+    //     if (cubes[i].y == y_coord) {
+    //         ctx.clearRect(cubes[i].x - 1, cubes[i].y - 1, cubes[i].size + 2, cubes[i].size + 2);
+    //     } else {
+    //         cubes_temp.push(cubes[i])
+    //     }
+    //     if (cubes[i].y > y_coord) {
+    //         cubes_move.push(cubes[i])
+    //     }
+    // }
+    // // update new cubes array
+    // cubes = cubes_temp
+
+    // // move all upper cubes one row below
+    // update_pos(cubes, "del_row")
+
+    let cubes_move = []
     let cubes_temp = []
     for (let i = 0; i < cubes.length; i++) {
-        if (cubes[i].y == y_coord) {
-            ctx.clearRect(cubes[i].x - 1, cubes[i].y - 1, cubes[i].size + 2, cubes[i].size + 2);
-        } else {
-            cubes_temp.push(cubes[i])
+        let deleted = false;
+        for (let j = 0; j < y_coords.length; j++) {
+            if (cubes[i].y == y_coords[j]) {
+                deleted = true
+                ctx.clearRect(cubes[i].x - 1, cubes[i].y - 1, cubes[i].size + 2, cubes[i].size + 2);
+            }
+        }
+        if (!deleted) {
+            cubes_temp.push(cubes[i]) 
+            if (cubes[i].y)
         }
     }
-    // update new cubes array
-    cubes = cubes_temp
-
-    // move all upper cubes one row below
-    update_pos(cubes, "del_row")
 
 }
 
