@@ -320,8 +320,10 @@ document.addEventListener('keydown', function(event) {
 });
 
 function rotate(rotation_dir) {
+    let rotate = true
+    // store new coord
+    let new_coord = []
     for (let i = 0; i < current_cubes.length; i++) {
-        ctx.clearRect(current_cubes[i].x - 1, current_cubes[i].y - 1, current_cubes[i].size + 2, current_cubes[i].size + 2);
         // translate to origin
         x0 = current_cubes[i].x - origin[0]
         y0 = current_cubes[i].y - origin[1]
@@ -342,13 +344,25 @@ function rotate(rotation_dir) {
         new_x += origin[0]
         new_y += origin[1]
 
-        current_cubes[i].x = new_x
-        current_cubes[i].y = new_y
+        new_coord.push([new_x, new_y])
+
+        // do not rotate if coordinates outside game box
+        if (new_x < 0 || new_x > 540 || new_y < 0 || new_y > 720) {
+            rotate = false;
+            break;
+        }
 
     }
-    // better updates if drawing in separated loop
-    for (let i = 0; i < current_cubes.length; i++) {
-        create_cube(current_cubes[i].x, current_cubes[i].y, current_cubes[i].size, current_cubes[i].color, current_cubes[i].id)
+    // update positions and redraw figure if rotation is possible
+    if (rotate) {
+        for (let i = 0; i < current_cubes.length; i++) {
+            ctx.clearRect(current_cubes[i].x - 1, current_cubes[i].y - 1, current_cubes[i].size + 2, current_cubes[i].size + 2);
+            current_cubes[i].x = new_coord[i][0]
+            current_cubes[i].y = new_coord[i][1]
+        }
+        for (let i = 0; i < current_cubes.length; i++) {
+            create_cube(current_cubes[i].x, current_cubes[i].y, current_cubes[i].size, current_cubes[i].color, current_cubes[i].id)
+        }
     }
 }
 
