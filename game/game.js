@@ -14,17 +14,18 @@ var cube_id = 0;
 // array of cubes of current figure (moving one)
 var current_cubes = null;
 var current_state = 'moving';
+// figure's central point
+var origin = null;
 
 function init() {
     // create init fig
     create_fig();
     // intervalId = setInterval(() => run(), 1000);
-    intervalId = setInterval(() => run(), 200);
+    intervalId = setInterval(() => run(), 1000);
 }
 
 function run() {
     // exit if game over -> no creation of other figures and stop calling run method
-    // console.log(cubes)
     check_full_rows()
     exit = false;
     occupied = check_move("slide_down");
@@ -159,7 +160,7 @@ function update_pos(cubes_type, operation_type) {
     for (let k = 0; k < cubes_type.length; k++) {
         // clear previous cube's position area
         ctx.clearRect(cubes_type[k].x - 1, cubes_type[k].y - 1, cubes_type[k].size + 2, cubes_type[k].size + 2);
-        // update y positions in current_cubes array
+        // update y positions in cubes array
         cubes_type[k].x += change_x
         cubes_type[k].y += change_y
     }
@@ -167,6 +168,9 @@ function update_pos(cubes_type, operation_type) {
         // draw new figure positions
         create_cube(cubes_type[k].x, cubes_type[k].y, cubes_type[k].size, cubes_type[k].color, cubes_type[k].id)
     }
+    // update figure's origin
+    origin[0] += change_x
+    origin[1] += change_y
 }
 
 
@@ -186,23 +190,15 @@ function create_cube(x, y, size, color, id) {
     } else {
         var cube = { x: x, y: y, size: size, color: color, id: id };
     }
-    // ctx.beginPath();
-    // ctx.fillStyle = color;
-    // // ctx.strokeStyle = color;
-    // // noStroke();
-    // // var fillRect = true;
-    // // ctx.rect(x, y, size, size);
-    // // if (fillRect) {
-    // //     ctx.fill();
-    // // }
-    ctx.fillStyle = color; // Set the fill color
-    ctx.fillRect(x, y, size, size); // Fill the cube with color
+    // Set the fill color
+    ctx.fillStyle = color; 
+    // Fill the cube with color
+    ctx.fillRect(x, y, size, size); 
 
-    ctx.strokeStyle = 'black'; // Set the border color
-    ctx.strokeRect(x, y, size, size); // Draw the border of the cube
-
-    // ctx.fillRect(x, y, size, size);
-    // ctx.stroke();
+    // Set the border color
+    ctx.strokeStyle = 'black'; 
+    // Draw the border of the cube
+    ctx.strokeRect(x, y, size, size); 
     return cube;
 }
 
@@ -212,10 +208,10 @@ function I_shape(x, color) {
 
     for (i = x - 60; i <= x + 120; i += 60) {
         new_cube = create_cube(i,-60,size,color);
-        // cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }  
-    current_cubes = temp_cubes;  
+    current_cubes = temp_cubes; 
+    origin = [x + 60, -60] 
 }
 
 function O_shape(x, color) {
@@ -224,11 +220,11 @@ function O_shape(x, color) {
     for (let i = x; i <= x + 60; i += 60) {
         for (let j = -60; j <= 0; j += 60) {
             new_cube = create_cube(i, j, size, color);
-            // cubes.push(new_cube);
             temp_cubes.push(new_cube)
         }
     }
     current_cubes = temp_cubes;
+    origin = [x+60,0]
 }
 
 function T_shape(x, color) {
@@ -237,13 +233,12 @@ function T_shape(x, color) {
 
     for (let i = x - 60; i <= x + 60; i+= 60) {
         new_cube = create_cube(i, -120, size, color);
-        // cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
     new_cube = create_cube(x, -60, size, color);
-    // cubes.push(new_cube);
     temp_cubes.push(new_cube);
     current_cubes = temp_cubes;
+    origin = [x + 30, -90]
 }
 
 function S_shape(x, color) {
@@ -251,15 +246,14 @@ function S_shape(x, color) {
     let temp_cubes = []
     for (let i = x; i <= x + 60; i += 60) {
     new_cube = create_cube(i, -120, size, color);
-    // cubes.push(new_cube);
     temp_cubes.push(new_cube)
     }
     for (let i = x - 60; i <= x; i += 60) {
     new_cube = create_cube(i, -60, size, color);
-    // cubes.push(new_cube);
     temp_cubes.push(new_cube)
     }
     current_cubes = temp_cubes;
+    origin = [x + 30,-90]
 }
 
 function Z_shape(x, color) {
@@ -267,16 +261,15 @@ function Z_shape(x, color) {
     let temp_cubes = []
     for (let i = x - 60; i <= x; i += 60) {
         new_cube = create_cube(i, -120, size, color);
-        // cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
 
     for (let i = x; i <= x + 60; i += 60) {
         new_cube = create_cube(i, -60, size, color);
-        // cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
     current_cubes = temp_cubes;
+    origin = [x + 30, -90]
 }
 
 function L_shape(x, color) {
@@ -284,13 +277,12 @@ function L_shape(x, color) {
     let temp_cubes = []
     for (let i = -180; i <= -60; i += 60) {
         new_cube = create_cube(x, i, size, color);
-        // cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
     new_cube = create_cube(x + 60, -60, size, color);
-    // cubes.push(new_cube);
     temp_cubes.push(new_cube)
     current_cubes = temp_cubes;
+    origin = [x+30, -90]
 }
 
 function J_shape(x, color) {
@@ -298,50 +290,69 @@ function J_shape(x, color) {
     let temp_cubes = []
     for (let i = -180; i <= -60; i += 60) {
         new_cube = create_cube(x, i, size, color);
-        // cubes.push(new_cube);
         temp_cubes.push(new_cube)
     }
     new_cube = create_cube(x - 60, -60, size, color);
-    // cubes.push(new_cube);
     temp_cubes.push(new_cube)
     current_cubes = temp_cubes;
+    origin = [x + 30, -90]
 }
 
 // listen for key event to rotate figures
 document.addEventListener('keydown', function(event) {
     if (current_state == "moving") {
         if (event.key == "ArrowLeft") {
-            console.log('left')
             occupied = check_move_left()
             if (!occupied) {
                 update_pos(current_cubes, "move_left")
             }
         } else if (event.key == "ArrowRight") {
-            console.log('right')
             occupied = check_move_right()
             if (!occupied) {
                 update_pos(current_cubes, "move_right")
             }
         } else if (event.key == "ArrowUp") {
-            console.log('up')
-            rotate_left()
+            rotate("rotation_left")
         } else if (event.key == "ArrowDown") {
-            console.log('down')
-            rotate_right()
+            rotate("rotation_right")
         }
     }
 });
 
-function rotate_left() {
-    console.log('Called left')
-}
+function rotate(rotation_dir) {
+    for (let i = 0; i < current_cubes.length; i++) {
+        ctx.clearRect(current_cubes[i].x - 1, current_cubes[i].y - 1, current_cubes[i].size + 2, current_cubes[i].size + 2);
+        // translate to origin
+        x0 = current_cubes[i].x - origin[0]
+        y0 = current_cubes[i].y - origin[1]
+        // rotate
+        // rotation matrix for 90 degrees counter-clockwise [[cos(90), -sen(90)], [sen(90), cos(90)]]
+        rot_matrix = null
+        if (rotation_dir == "rotation_left") {
+            rot_matrix = [[0,-1], [1,0]]
+        } else {
+            rot_matrix = [[0,1], [-1,0]]
+        }
+        new_x = 0
+        new_y = 0
+        // vector-matrix multiplication
+        new_x = rot_matrix[0][0] * x0 + rot_matrix[0][1] * y0
+        new_y = rot_matrix[1][0] * x0 + rot_matrix[1][1] * y0
+        // translate back
+        new_x += origin[0]
+        new_y += origin[1]
 
-function rotate_right() {
-    console.log('Called right')
+        current_cubes[i].x = new_x
+        current_cubes[i].y = new_y
+
+    }
+    // better updates if drawing in separated loop
+    for (let i = 0; i < current_cubes.length; i++) {
+        create_cube(current_cubes[i].x, current_cubes[i].y, current_cubes[i].size, current_cubes[i].color, current_cubes[i].id)
+    }
 }
 
 function clear(cube_obj) {
-    // ctx.clearRect(cube_obj.x, cube_obj.y, cube_obj.size, cube_obj.size);
     ctx.clearRect(cube.x - 1, cube.y - 1, cube.size + 2, cube.size + 2);
 }
 
@@ -356,9 +367,7 @@ function check_full_rows() {
             row_count[String(cubes[i].y)] = 1
         }
     }
-    console.log(row_count)
-
-    // find full rows (10 tiles)
+    // find full rows (with 10 tiles)
     for (let key in row_count) {
         if (row_count[key] == 10) {
             delete_full_row(parseInt(key))
@@ -367,7 +376,6 @@ function check_full_rows() {
 }
 
 function delete_full_row(y_coord) {
-    console.log(y_coord)
     // delete all tiles in the given y coordinate
     let cubes_temp = []
     for (let i = 0; i < cubes.length; i++) {
