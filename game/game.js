@@ -218,13 +218,13 @@ function O_shape(x, color) {
     let new_cube = {};
     let temp_cubes = []
     for (let i = x; i <= x + 60; i += 60) {
-        for (let j = -60; j <= 0; j += 60) {
+        for (let j = -120; j <= -60; j += 60) {
             new_cube = create_cube(i, j, size, color);
             temp_cubes.push(new_cube)
         }
     }
     current_cubes = temp_cubes;
-    origin = [x+60,0]
+    origin = [x + 30, -30]
 }
 
 function T_shape(x, color) {
@@ -335,15 +335,12 @@ function rotate(rotation_dir) {
         } else {
             rot_matrix = [[0,1], [-1,0]]
         }
-        new_x = 0
-        new_y = 0
         // vector-matrix multiplication
         new_x = rot_matrix[0][0] * x0 + rot_matrix[0][1] * y0
         new_y = rot_matrix[1][0] * x0 + rot_matrix[1][1] * y0
         // translate back
         new_x += origin[0]
         new_y += origin[1]
-
         new_coord.push([new_x, new_y])
 
         // do not rotate if coordinates outside game box
