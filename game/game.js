@@ -146,8 +146,11 @@ Param:
 cubes -> cubes which have to move
 type -> type of cubes
 */
-function update_pos(cubes_type, operation_type) {
-    if (operation_type == 'slide_down' || operation_type == 'del_row') {
+function update_pos(cubes_type, operation_type, nr_rows) {
+    let change_x = 0
+    let change_y = 0
+
+    if (operation_type == 'slide_down') {
         change_x = 0
         change_y = 60
     } else if (operation_type == "move_left") {
@@ -156,6 +159,9 @@ function update_pos(cubes_type, operation_type) {
     } else if (operation_type == "move_right") {
         change_x = 60
         change_y = 0
+    } else if (operation_type == "del_rows") {
+        change_x = 0
+        change_y = nr_rows * 60
     }
     for (let k = 0; k < cubes_type.length; k++) {
         // clear previous cube's position area
@@ -378,38 +384,20 @@ function check_full_rows() {
             row_count[String(cubes[i].y)] = 1
         }
     }
-    rows_coord = []
-    // find full rows (with 10 tiles)
+    y_coords = []
+    // find y coord of full rows (with 10 tiles)
     for (let key in row_count) {
         if (row_count[key] == 10) {
-            rows_coord.push(parseInt(key))
+            y_coords.push(parseInt(key))
         }
     }
-    delete_full_rows(parseInt(key))
+    delete_full_rows(y_coords)
 }
 
 function delete_full_rows(y_coords) {
-    // // delete all tiles in the given y coordinate
-    // let cubes_move = []
-    // let cubes_temp = []
-    // for (let i = 0; i < cubes.length; i++) {
-    //     if (cubes[i].y == y_coord) {
-    //         ctx.clearRect(cubes[i].x - 1, cubes[i].y - 1, cubes[i].size + 2, cubes[i].size + 2);
-    //     } else {
-    //         cubes_temp.push(cubes[i])
-    //     }
-    //     if (cubes[i].y > y_coord) {
-    //         cubes_move.push(cubes[i])
-    //     }
-    // }
-    // // update new cubes array
-    // cubes = cubes_temp
-
-    // // move all upper cubes one row below
-    // update_pos(cubes, "del_row")
-
-    let cubes_move = []
+    let move_cubes = []
     let cubes_temp = []
+    let min_y = Math.max(...y_coords)
     for (let i = 0; i < cubes.length; i++) {
         let deleted = false;
         for (let j = 0; j < y_coords.length; j++) {
@@ -420,9 +408,13 @@ function delete_full_rows(y_coords) {
         }
         if (!deleted) {
             cubes_temp.push(cubes[i]) 
-            if (cubes[i].y)
+            if (cubes[i].y < min_y) {
+                move_cubes.push(cubes[i])
+            }
         }
     }
+    cubes = cubes_temp;
+    update_pos(move_cubes, "del_rows", y_coords.length);
 
 }
 
