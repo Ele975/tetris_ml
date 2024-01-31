@@ -350,7 +350,7 @@ function rotate(rotation_dir) {
         new_coord.push([new_x, new_y])
 
         // do not rotate if coordinates outside game box
-        if (new_x < 0 || new_x > 540 || new_y < 0 || new_y > 720) {
+        if (new_x < 0 || new_x > 540 || new_y > 720) {
             rotate = false;
             break;
         }
