@@ -1,12 +1,17 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
+const score_text = document.getElementById("score");
+console.log(score_text)
+
 // tile size
 const size = 60;
-const colors = new Array('gold', 'orange', 'red', 'green', 'blue', 'aqua', 'purple')
+// const colors = new Array('lightyellow', 'coral', 'red', 'chartreuse', 'dodgerblue', 'aqua', 'magenta')
+// 
+// const colors = new Array('cyan', 'magenta', 'yellow', 'chartreuse', 'lightsalmon', 'red')
+const colors = new Array('#04d9ff', '#ff9933', '#0cff0c', '#fe019a', '#bc13fe', '#ff073a', '#cfff04')
 // call function for given shape
 const tetrominoes = { "I": I_shape, "O": O_shape, "T": T_shape, "S": S_shape, "Z": Z_shape, "L": L_shape, "J": J_shape };
-// const x_coords = new Array(0, 60, 120, 180, 240, 300, 360, 420, 480, 540);
 
 // array of all cubes. Cubes of current figure are appended at the end when it stops
 var cubes = new Array();
@@ -17,10 +22,18 @@ var current_state = 'moving';
 // figure's central point
 var origin = null;
 
+var score = 0;
+var game_state = "active";
+
+// write here to display immediately
+let txt = "Score: " + score;
+score_text.innerHTML = txt;
+
+
 function init() {
     // create init fig
     create_fig();
-    // intervalId = setInterval(() => run(), 1000);
+    // draw game grid
     intervalId = setInterval(() => run(), 400);
 }
 
@@ -33,6 +46,7 @@ function run() {
         current_state = "still"
         for (let i = 0; i < current_cubes.length; i++) {
             if (current_cubes[i].y <= 0) {
+                game_state = "lost";
                 console.log('GAME OVER');
                 clearInterval(intervalId);
                 exit = true;
@@ -47,6 +61,9 @@ function run() {
         // if new coordinates are occupied don't move, otherwise move down
         update_pos(current_cubes, 'slide_down')
     }
+    // update score
+    let txt = "Score: " + score;
+    score_text.innerHTML = txt;
 }
 
 /*
@@ -177,6 +194,26 @@ function update_pos(cubes_type, operation_type, nr_rows) {
     // update figure's origin
     origin[0] += change_x
     origin[1] += change_y
+
+    // update score -> NINTENDO scoring level 0
+    lines_score = 0;
+    if (operation_type == "del_rows") {
+        switch(nr_rows){
+            case 1:
+                lines_score = 40;
+                break;
+            case 2:
+                lines_score = 100;
+                break;
+            case 3:
+                lines_score = 300;
+                break;
+            case 4:
+                lines_score = 1200;
+                break;
+        }
+        score += lines_score;
+    }
 }
 
 
@@ -203,6 +240,7 @@ function create_cube(x, y, size, color, id) {
 
     // Set the border color
     ctx.strokeStyle = 'black'; 
+    ctx.lineWidth = 0.5;
     // Draw the border of the cube
     ctx.strokeRect(x, y, size, size); 
     return cube;
@@ -306,6 +344,7 @@ function J_shape(x, color) {
 
 // listen for key event to rotate figures
 document.addEventListener('keydown', function(event) {
+    event.preventDefault()
     if (current_state == "moving") {
         if (event.key == "ArrowLeft") {
             occupied = check_move_left()
@@ -366,10 +405,6 @@ function rotate() {
             create_cube(current_cubes[i].x, current_cubes[i].y, current_cubes[i].size, current_cubes[i].color, current_cubes[i].id)
         }
     }
-}
-
-function clear(cube_obj) {
-    ctx.clearRect(cube.x - 1, cube.y - 1, cube.size + 2, cube.size + 2);
 }
 
 function check_full_rows() {
