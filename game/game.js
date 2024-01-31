@@ -318,14 +318,18 @@ document.addEventListener('keydown', function(event) {
                 update_pos(current_cubes, "move_right")
             }
         } else if (event.key == "ArrowUp") {
-            rotate("rotation_left")
+            rotate()
         } else if (event.key == "ArrowDown") {
-            rotate("rotation_right")
+            let occupied = check_slide_down()
+            if (!occupied) {
+                update_pos(current_cubes, "slide_down")
+            }
+
         }
     }
 });
 
-function rotate(rotation_dir) {
+function rotate() {
     let rotate = true
     // store new coord
     let new_coord = []
@@ -335,12 +339,7 @@ function rotate(rotation_dir) {
         y0 = current_cubes[i].y - origin[1]
         // rotate
         // rotation matrix for 90 degrees counter-clockwise [[cos(90), -sen(90)], [sen(90), cos(90)]]
-        rot_matrix = null
-        if (rotation_dir == "rotation_left") {
-            rot_matrix = [[0,-1], [1,0]]
-        } else {
-            rot_matrix = [[0,1], [-1,0]]
-        }
+        rot_matrix = [[0,-1], [1,0]]
         // vector-matrix multiplication
         new_x = rot_matrix[0][0] * x0 + rot_matrix[0][1] * y0
         new_y = rot_matrix[1][0] * x0 + rot_matrix[1][1] * y0
